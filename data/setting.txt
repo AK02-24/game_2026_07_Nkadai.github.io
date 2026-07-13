@@ -1,0 +1,9 @@
+[setting]
+volume=73
+bgm_volume=26
+control_type=wasd_arrow
+key_up=k
+key_down=s
+key_left=a
+key_right=d
+key_ability=space

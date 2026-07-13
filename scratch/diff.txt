@@ -1,0 +1,181 @@
+﻿diff --git a/index.html b/index.html
+index e9ef1d4..a9aac5b 100644
+--- a/index.html
++++ b/index.html
+@@ -2158,9 +2158,14 @@
+                 if (serverGame.round > gameState.round) {
+                     // 騾夐℃
+                 }
+-                // 2. 蜷後§繝ｩ繧ｦ繝ｳ繝峨□縺後∽ｽ懈・閠・′莠､莉｣縺励※縺・ｋ縺ｪ繧臥┌譚｡莉ｶ縺ｧ譁ｰ縺励＞繝・・繧ｿ
++                // 2. 蜷後§繝ｩ繧ｦ繝ｳ繝峨□縺後∽ｽ懈・閠・′莠､莉｣縺励※縺・ｋ縺ｪ繧峨√し繝ｼ繝舌・蛛ｴ縺ｮ菴懈・閠・・ｺ上′繝ｭ繝ｼ繧ｫ繝ｫ繧医ｊ騾ｲ繧薙〒縺・ｋ縺区ｯ碑ｼ・☆繧・
+                 else if (serverGame.round === gameState.round && serverGame.creator !== gameState.creator) {
+-                    // 騾夐℃
++                    const creatorOrder = { 'host': 1, 'client': 2 };
++                    const localCreatorOrder = creatorOrder[gameState.creator] || 0;
++                    const serverCreatorOrder = creatorOrder[serverGame.creator] || 0;
++                    if (serverCreatorOrder < localCreatorOrder) {
++                        return; // 繧ｵ繝ｼ繝舌・縺ｮ繝・・繧ｿ縺ｯ蜿､縺・ち繝ｼ繝ｳ・亥ｷｻ縺肴綾繧奇ｼ峨↑縺ｮ縺ｧ遐ｴ譽・☆繧・
++                    }
+                 }
+                 // 3. 蜷後§繝ｩ繧ｦ繝ｳ繝峨°縺､蜷後§菴懈・閠・ｼ亥酔縺倥ち繝ｼ繝ｳ蜀・ｼ峨・蝣ｴ蜷医・縲√ヵ繧ｧ繝ｼ繧ｺ縺ｮ鬆・ｺ上ｒ豈碑ｼ・☆繧・
+                 else if (serverGame.round === gameState.round && serverGame.creator === gameState.creator) {
+@@ -2297,8 +2302,9 @@
+                     // 繝ｬ繝ｼ繧ｹ繧ｳ繝ｳ繝・ぅ繧ｷ繝ｧ繝ｳ・亥商縺・≦蟒ｶ繝代こ繝・ヨ縺ｫ繧医ｋ繝輔ぉ繝ｼ繧ｺ蟾ｻ縺肴綾繧顔ｴ螢奇ｼ峨ｒ髦ｲ豁｢縺吶ｋ繧ｬ繝ｼ繝・
+                     let ignorePhaseChange = false;
+                     if (gameState.phase === 'maze_create' && isMeCreator) {
+-                        // 閾ｪ蛻・′霑ｷ霍ｯ菴懈・荳ｭ縺ｫ縲∫嶌謇九°繧牙ｱ翫＞縺溘稽aze_create縲堺ｻ･螟悶・莉悶・繝輔ぉ繝ｼ繧ｺ繝・・繧ｿ縺ｯ縺吶∋縺ｦ辟｡隕悶☆繧・
+-                        if (serverGame.phase !== 'maze_create') {
++                        // 閾ｪ蛻・′霑ｷ霍ｯ菴懈・荳ｭ縺ｧ縲√°縺､縲後∪縺豎ｺ螳壼ｮ御ｺ・ｼ・eady・峨＠縺ｦ縺・↑縺・凾縲阪・縺ｿ縲・≦蟒ｶ繝輔ぉ繝ｼ繧ｺ驕ｷ遘ｻ繧堤┌隕悶☆繧・
++                        const myReady = (myRole === 'host') ? gameState.host_ready : gameState.client_ready;
++                        if (!myReady && serverGame.phase !== 'maze_create') {
+                             ignorePhaseChange = true;
+                             console.log("Ignored delayed phase change to prevent creator state rollback:", serverGame.phase);
+                         }
+@@ -2316,6 +2322,9 @@
+                         gameState = serverGame;
+                         setupGamePhase();
+                         return;
++                    } else {
++                        // 驕・ｻｶ繝代こ繝・ヨ縺ｫ繧医ｋ蟾ｻ縺肴綾縺励ｒ辟｡隕悶☆繧句ｴ蜷医・縲√％繧御ｻ･髯阪・蜷梧悄蜃ｦ逅・ｂ陦後ｏ縺壹↓蜊ｳ邨ゆｺ・☆繧・
++                        return;
+                     }
+                 }
+ 
+@@ -2355,6 +2364,7 @@
+                             gameState.client_ready = false;
+                             gameState.player_invincible_until = Date.now() + 1000; // 1遘帝俣辟｡謨ｵ (繝ｪ繧ｹ繧ｭ繝ｫ髦ｲ豁｢)
+                             sendGameState();
++                            setupGamePhase(); // 繝帙せ繝郁・霄ｫ繧ら判髱｢繧定┳蜃ｺ繝輔ぉ繝ｼ繧ｺ縺ｫ蛻・ｊ譖ｿ縺医ｋ
+                         }
+                     }
+                 }
+@@ -2396,7 +2406,7 @@
+ 
+         // 繧ｪ繝ｳ繝ｩ繧､繝ｳ繧ｲ繝ｼ繝迥ｶ諷九・騾∽ｿ｡ (P2P蜆ｪ蜈医．B縺ｸ縺ｮ繝舌ャ繧ｯ繧｢繝・・縺ゅｊ)
+         function sendGameState(forceDB = false) {
+-            if (isLocalDebugMode) return;
++            if (isLocalDebugMode) return Promise.resolve();
+ 
+             // 縲舌・繧ｹ繧ｿ繝ｼ讓ｩ髯舌ぎ繝ｼ繝峨大商縺・┌鬧・↑繝・・繧ｿ縺ｮ騾∽ｿ｡繝ｻ騾・ｵ√↓繧医ｋ蟾ｻ縺肴綾繧顔ｴ螢翫ｒ髦ｲ豁｢縺吶ｋ・医け繝ｩ繧､繧｢繝ｳ繝亥・縺ｮ縺ｿ縺ｫ髯仙ｮ夲ｼ・
+             if (myRole === 'client') {
+@@ -2406,12 +2416,12 @@
+                 if (gameState.phase === 'maze_create' && !isMeCreator) {
+                     // 霑ｷ霍ｯ菴懈・荳ｭ縺ｯ縲・撼菴懈・閠・°繧峨・繝・・繧ｿ騾∽ｿ｡繧剃ｸ蛻・ｦ∵ｭ｢縺吶ｋ
+                     console.log("sendGameState blocked: Client is not the creator in maze_create phase");
+-                    return;
++                    return Promise.resolve();
+                 }
+                 if (gameState.phase === 'maze_escape' && !isMeAttacker) {
+                     // 霑ｷ霍ｯ閼ｱ蜃ｺ荳ｭ縺ｯ縲・撼繧｢繧ｿ繝・き繝ｼ縺九ｉ縺ｮ繝・・繧ｿ騾∽ｿ｡繧剃ｸ蛻・ｦ∵ｭ｢縺吶ｋ
+                     console.log("sendGameState blocked: Client is not the attacker in maze_escape phase");
+-                    return;
++                    return Promise.resolve();
+                 }
+             }
+ 
+@@ -2451,7 +2461,7 @@
+             window.lastSentClientLife = gameState.client_life;
+ 
+             if (shouldSaveToDB && !isFileProtocol) {
+-                fetch('./api_session.php', {
++                return fetch('./api_session.php', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json' },
+                     body: JSON.stringify({
+@@ -2461,6 +2471,7 @@
+                     })
+                 });
+             }
++            return Promise.resolve();
+         }
+ 
+         // --- Canvas 縺ｨ謠冗判繧ｷ繧ｹ繝・Β ---
+@@ -4215,28 +4226,34 @@
+ 
+             // --- 繧ｪ繝ｳ繝ｩ繧､繝ｳ蟇ｾ謌ｦ譎ゅ・繝昴・繝ｪ繝ｳ繧ｰ閾ｪ蜍募宛蠕｡ ---
+             if (!isLocalDebugMode && sessionId) {
+-                if (gameState.phase === 'char_select') {
+-                    startWorker(sessionId);
+-                } else if (gameState.phase === 'maze_create') {
+-                    if (isMeCreator) {
+-                        stopWorker();
+-                    } else {
+-                        startWorker(sessionId);
+-                    }
+-                } else if (gameState.phase === 'maze_escape') {
+-                    if (isMeAttacker) {
+-                        stopWorker();
+-                    } else {
++                if (isP2PActive) {
++                    // P2P騾壻ｿ｡・・ebRTC・峨′譛牙柑縺ｪ髢薙・縲√・繝ｼ繝ｪ繝ｳ繧ｰWorker縺ｯ螳悟・縺ｫ蛛懈ｭ｢縺輔○縺ｾ縺・
++                    stopWorker();
++                } else {
++                    // P2P譛ｪ謗･邯壹・譎ゅ・縺ｿ縲√ヵ繧ｧ繝ｼ繧ｺ縺斐→縺ｫ繝昴・繝ｪ繝ｳ繧ｰWorker繧堤ｴｰ縺九￥蛻ｶ蠕｡縺励∪縺・
++                    if (gameState.phase === 'char_select') {
+                         startWorker(sessionId);
+-                    }
+-                } else if (gameState.phase === 'result_check') {
+-                    if (myRole === 'host') {
++                    } else if (gameState.phase === 'maze_create') {
++                        if (isMeCreator) {
++                            stopWorker();
++                        } else {
++                            startWorker(sessionId);
++                        }
++                    } else if (gameState.phase === 'maze_escape') {
++                        if (isMeAttacker) {
++                            stopWorker();
++                        } else {
++                            startWorker(sessionId);
++                        }
++                    } else if (gameState.phase === 'result_check') {
++                        if (myRole === 'host') {
++                            stopWorker();
++                        } else {
++                            startWorker(sessionId);
++                        }
++                    } else if (gameState.phase === 'game_over') {
+                         stopWorker();
+-                    } else {
+-                        startWorker(sessionId);
+                     }
+-                } else if (gameState.phase === 'game_over') {
+-                    stopWorker();
+                 }
+             }
+ 
+@@ -4545,25 +4562,17 @@
+                     setupGamePhase();
+                 } else {
+                     // 繧ｯ繝ｩ繧､繧｢繝ｳ繝医′菴懈・閠・・蝣ｴ蜷医√∪縺溘・P2P縺梧悴謗･邯壹・蝣ｴ蜷医・縲∫嶌謇具ｼ医・繧ｹ繝茨ｼ峨↓迥ｶ諷九ｒ騾∽ｿ｡
+-                    sendGameState(true);
++                    const sendPromise = sendGameState(true);
+ 
+-                    // PHP繝昴・繝ｪ繝ｳ繧ｰ縺九▽譛ｪ謗･邯壹・譎ゅ・縺ｿ縲．B騾∽ｿ｡縺ｨ繝昴・繝ｪ繝ｳ繧ｰ蜀埼幕繧呈・遉ｺ逧・↓陦後≧
++                    // PHP繝昴・繝ｪ繝ｳ繧ｰ縺九▽譛ｪ謗･邯壹・譎ゅ・縺ｿ縲．B騾∽ｿ｡縺悟ｮ御ｺ・＠縺溷ｾ後↓繝昴・繝ｪ繝ｳ繧ｰ繧貞・髢九☆繧・
+                     if (!isP2PActive && !isFileProtocol) {
+-                        let updateData = {
+-                            action: 'update',
+-                            session_id: sessionId,
+-                            game_state: gameState
+-                        };
+-                        if (myRole === 'host') updateData.host_ready = true;
+-                        else updateData.client_ready = true;
+-
+-                        fetch('./api_session.php', {
+-                            method: 'POST',
+-                            headers: { 'Content-Type': 'application/json' },
+-                            body: JSON.stringify(updateData)
+-                        }).then(() => {
+-                            startWorker(sessionId); // 繝昴・繝ｪ繝ｳ繧ｰ蜀埼幕
+-                        });
++                        if (sendPromise && typeof sendPromise.then === 'function') {
++                            sendPromise.then(() => {
++                                startWorker(sessionId); // 繝昴・繝ｪ繝ｳ繧ｰ蜀埼幕
++                            });
++                        } else {
++                            startWorker(sessionId); // 蜊ｳ蠎ｧ縺ｫ蜀埼幕
++                        }
+                     }
+                 }
+             }

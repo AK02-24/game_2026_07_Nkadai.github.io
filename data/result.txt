@@ -1,0 +1,4 @@
+[result]
+Guest,CPU,win,3,2026-07-06 02:03:47
+Guest,Player 2,lose,3,2026-07-13 05:49:25
+Guest,Player 1,win,3,2026-07-13 05:49:25

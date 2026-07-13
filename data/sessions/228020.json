@@ -1,0 +1,36 @@
+{
+    "session_id": "228020",
+    "host_status": "waiting",
+    "client_status": "waiting",
+    "current_turn": 1,
+    "game_state": {
+        "round": 1,
+        "phase": "char_select",
+        "creator": "host",
+        "attacker": "client",
+        "maze": [],
+        "host_char": null,
+        "client_char": "defender",
+        "host_ready": false,
+        "client_ready": true,
+        "player_pos": {
+            "x": 0,
+            "y": 0
+        },
+        "player_facing": "right",
+        "placed_templates": [],
+        "host_life": 3,
+        "client_life": 3,
+        "special_used": false,
+        "create_time_left": 60,
+        "escape_time_left": 30,
+        "escape_status": "playing",
+        "broken_walls": [],
+        "stepped_crush_floors": [],
+        "creator_inventory": null,
+        "host_status": "waiting",
+        "client_status": "waiting",
+        "current_turn": 1
+    },
+    "updated_at": "2026-07-07 06:13:42"
+}
