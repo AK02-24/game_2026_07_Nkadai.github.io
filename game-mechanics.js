@@ -200,6 +200,7 @@ function getTileDirection(state, x, y) {
  * 敵などの場合は、自動で動きを管理するための配列 (enemies) にも追加を行います。
  */
 function placeSingleTile(state, x, y, tile, dir, partId) {
+    ensureTileMeta(state);
     state.maze[y][x] = tile;
     
     // 向きやパーツIDなどのメタデータを記録
@@ -229,6 +230,7 @@ function placeSingleTile(state, x, y, tile, dir, partId) {
  * 回収したパーツは、作成者の手持ちインベントリに戻されます。
  */
 function removePlacedAt(state, x, y) {
+    ensureTileMeta(state);
     // 複数マスのテンプレート壁の一部である場合は、ここでは処理できません
     if (findPlacedTemplateAt(state, x, y) !== -1) return false;
 

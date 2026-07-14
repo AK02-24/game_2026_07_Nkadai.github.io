@@ -1303,7 +1303,8 @@
         // ==========================================================================
         
         // file:// プロトコル（ローカル直開き）で実行されているかどうかの判定用フラグ
-        const isFileProtocol = (window.location.protocol === 'file:');
+        // GitHub Pages等の静的サーバー環境（PHP非対応）もこのフラグを有効（ダイレクトP2P）にする
+        const isFileProtocol = (window.location.protocol === 'file:') || window.location.hostname.endsWith('github.io') || window.location.hostname.includes('github');
         
         // 迷路の縦横グリッドマス数 (20×20マス)
         const SIZE = 20;
@@ -2295,6 +2296,7 @@
                     // クライアントなどの受信側: ホストがゲームを開始してフェーズが進行したかを検知
                     if (serverState.game_state.phase !== 'char_select') {
                         gameState = serverState.game_state; // 最新のゲームステート（creator_inventory等を含む）で上書き
+                        ensureTileMeta(gameState);
                         if (!isP2PActive) stopWorker();
                         goToScreen('screen-game');
                         setupGamePhase();
@@ -2387,6 +2389,7 @@
                     if (!ignorePhaseChange) {
                         // フェーズが切り替わった瞬間は、サーバー側の最新状態に丸ごと同期して遷移する
                         gameState = serverGame;
+                        ensureTileMeta(gameState);
                         setupGamePhase();
                         return;
                     } else {
@@ -2463,6 +2466,7 @@
                 else {
                     // result_check, game_over は全上書き
                     gameState = serverGame;
+                    ensureTileMeta(gameState);
                 }
 
                 if (phaseChanged) {
