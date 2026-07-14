@@ -388,6 +388,51 @@
             gap: 1rem;
         }
 
+        .guide-nav-btn {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            backdrop-filter: blur(5px);
+        }
+
+        .guide-nav-btn:hover {
+            background: var(--neon-cyan);
+            border-color: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transform: scale(1.05);
+        }
+        
+        .guide-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .guide-dot.active {
+            background: var(--neon-cyan);
+            box-shadow: 0 0 8px var(--neon-cyan);
+            transform: scale(1.2);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+
         .match-panel {
             grid-column: 3;
             background: rgba(0, 242, 254, 0.02);
@@ -917,7 +962,7 @@
 
                 <!-- 中: メニュー -->
                 <div class="menu-panel">
-                    <button class="btn" onclick="openModal('modal-history')">戦歴</button>
+                    <button class="btn btn-cyan" onclick="openModal('modal-guide')">操作説明</button>
                     <button class="btn" onclick="openModal('modal-characters')">キャラクター一覧</button>
                     <button class="btn" onclick="openModal('modal-parts')">パーツ一覧</button>
                     <button class="btn btn-magenta" onclick="openModal('modal-settings')">設定</button>
@@ -1160,26 +1205,41 @@
 
     </div>
 
-    <!-- モーダル: 戦歴 -->
-    <div id="modal-history" class="modal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('modal-history')">&times;</span>
-            <h2 class="neon-text-cyan">戦歴</h2>
-            <div style="max-height: 350px; overflow-y: auto;">
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th>日付</th>
-                            <th>プレイヤー</th>
-                            <th>対戦相手</th>
-                            <th>結果</th>
-                            <th>往復数</th>
-                        </tr>
-                    </thead>
-                    <tbody id="history-table-body">
-                        <!-- JSで動的追加 -->
-                    </tbody>
-                </table>
+    <!-- モーダル: 操作説明 -->
+    <div id="modal-guide" class="modal">
+        <div class="modal-content" style="max-width: 800px; padding: 2.5rem; background: radial-gradient(circle at top left, rgba(3,4,8,0.98), rgba(15,15,30,0.99)); border: 1px solid var(--neon-cyan); box-shadow: 0 0 30px rgba(0, 242, 254, 0.25);">
+            <span class="modal-close" onclick="closeModal('modal-guide')">&times;</span>
+            <h2 class="neon-text-cyan" style="text-align: center; margin-bottom: 1.5rem; font-family: var(--font-title); font-size: 2rem; letter-spacing: 2px;">GAME GUIDE</h2>
+            
+            <!-- スライドショーコンテナ -->
+            <div style="display: flex; align-items: center; justify-content: space-between; min-height: 380px; background: rgba(0,0,0,0.4); border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); padding: 1.5rem; gap: 1.5rem; overflow: hidden;">
+                <!-- 左矢印 -->
+                <button class="guide-nav-btn" onclick="changeGuideSlide(-1)" style="flex-shrink: 0;">&lt;</button>
+                
+                <!-- スライド内容 -->
+                <div id="guide-modal-content" style="display: flex; flex: 1; gap: 2rem; align-items: center; transition: opacity 0.2s ease;">
+                    <!-- 左側: 大きなビジュアル画像 -->
+                    <div style="flex: 1.2; display: flex; justify-content: center; align-items: center;">
+                        <div id="guide-modal-img-container" style="position: relative; width: 260px; height: 260px; border-radius: 20px; background: radial-gradient(circle, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.4) 100%); display: flex; justify-content: center; align-items: center; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: all 0.3s;">
+                            <img id="guide-modal-img" src="" style="width: 160px; height: 160px; filter: drop-shadow(0 0 15px var(--neon-cyan)); transition: transform 0.5s;" alt="Guide Graphic">
+                        </div>
+                    </div>
+                    <!-- 右側: 丁寧なテキスト説明 -->
+                    <div style="flex: 1.5; display: flex; flex-direction: column; justify-content: center; text-align: left; gap: 0.8rem;">
+                        <h3 id="guide-modal-title" style="margin: 0; font-size: 1.4rem; font-family: var(--font-title); color: var(--neon-cyan); text-shadow: 0 0 8px currentColor; letter-spacing: 1px;">タイトル</h3>
+                        <div id="guide-modal-desc" style="font-size: 0.9rem; color: var(--text-color); line-height: 1.6; display: flex; flex-direction: column; gap: 0.6rem;">
+                            <!-- 動的挿入 -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右矢印 -->
+                <button class="guide-nav-btn" onclick="changeGuideSlide(1)" style="flex-shrink: 0;">&gt;</button>
+            </div>
+            
+            <!-- 下部ドットインジケータ -->
+            <div style="display: flex; justify-content: center; gap: 0.8rem; margin-top: 1.5rem;" id="guide-dots-container">
+                <!-- 動的追加 -->
             </div>
         </div>
     </div>
@@ -2013,80 +2073,14 @@
         // --- モーダル制御 ---
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'flex';
-            if (modalId === 'modal-history') {
-                loadMatchHistory();
+            if (modalId === 'modal-guide') {
+                currentGuideIndex = 0;
+                updateGuideSlide();
             }
         }
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
-        }
-
-        async function loadMatchHistory() {
-            const tbody = document.getElementById('history-table-body');
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">ロード中...</td></tr>';
-
-            if (isFileProtocol) {
-                // file:// スキーム時は localStorage から読み込む
-                try {
-                    const saved = localStorage.getItem('cyber_maze_history');
-                    const historyList = saved ? JSON.parse(saved) : [];
-
-                    if (historyList.length > 0) {
-                        tbody.innerHTML = '';
-                        historyList.forEach(row => {
-                            const date = new Date(row.played_at).toLocaleString();
-                            let resClass = "result-draw";
-                            if (row.result === 'win') resClass = "result-win";
-                            if (row.result === 'lose') resClass = "result-lose";
-
-                            const tr = document.createElement('tr');
-                            tr.innerHTML = `
-                                <td>${date}</td>
-                                <td>${escapeHTML(row.player_name)}</td>
-                                <td>${escapeHTML(row.opponent_name)}</td>
-                                <td class="${resClass}">${row.result.toUpperCase()}</td>
-                                <td>${row.rounds} 往復</td>
-                            `;
-                            tbody.appendChild(tr);
-                        });
-                    } else {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">戦歴はありません。</td></tr>';
-                    }
-                } catch (e) {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--crusher-red);">データの読み込みに失敗しました。</td></tr>';
-                }
-                return;
-            }
-
-            try {
-                const res = await fetch('./api_history.php');
-                const data = await res.json();
-
-                if (data.status === 'success' && data.data.length > 0) {
-                    tbody.innerHTML = '';
-                    data.data.forEach(row => {
-                        const date = new Date(row.played_at).toLocaleString();
-                        let resClass = "result-draw";
-                        if (row.result === 'win') resClass = "result-win";
-                        if (row.result === 'lose') resClass = "result-lose";
-
-                        const tr = document.createElement('tr');
-                        tr.innerHTML = `
-                    <td>${date}</td>
-                    <td>${escapeHTML(row.player_name)}</td>
-                    <td>${escapeHTML(row.opponent_name)}</td>
-                    <td class="${resClass}">${row.result.toUpperCase()}</td>
-                    <td>${row.rounds} 往復</td>
-                `;
-                        tbody.appendChild(tr);
-                    });
-                } else {
-                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">戦歴はありません。</td></tr>';
-                }
-            } catch (err) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--crusher-red);">データの読み込みに失敗しました。</td></tr>';
-            }
         }
 
         function escapeHTML(str) {
@@ -4958,47 +4952,9 @@
             goToScreen('screen-home');
         }
 
-        // --- オンライン戦歴の保存 ---
+        // --- オンライン戦歴の保存 (機能廃止のため処理なし) ---
         function saveMatchHistoryToDB(outcome) {
-            // 相手の名前を決定
-            let oppName = (myRole === 'host') ? "Player 2" : "Player 1";
-
-            if (isFileProtocol) {
-                // file:// スキーム時は localStorage に追加保存する
-                try {
-                    const saved = localStorage.getItem('cyber_maze_history');
-                    const historyList = saved ? JSON.parse(saved) : [];
-
-                    historyList.unshift({
-                        played_at: new Date().toISOString(),
-                        player_name: myName,
-                        opponent_name: oppName,
-                        result: outcome,
-                        rounds: gameState.round
-                    });
-
-                    // 最大50件に制限
-                    if (historyList.length > 50) {
-                        historyList.pop();
-                    }
-
-                    localStorage.setItem('cyber_maze_history', JSON.stringify(historyList));
-                } catch (e) {
-                    console.error("Failed to save match history to localStorage", e);
-                }
-                return;
-            }
-
-            fetch('./api_history.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    player_name: myName,
-                    opponent_name: oppName,
-                    result: outcome,
-                    rounds: gameState.round
-                })
-            });
+            // No-op (戦歴機能は無効化されました)
         }
 
 
@@ -5279,6 +5235,138 @@
                 console.log("Background image load failed, falling back to default styling: " + randomBg);
             };
             img.src = randomBg;
+        }
+
+        // --- 操作ガイドスライドショーシステム (モーダル表示) ---
+        const GUIDE_SLIDES = [
+            {
+                title: "01. 基本ゲームサイクル",
+                img: "assets/characters/crusher.svg",
+                color: "var(--crusher-red)",
+                desc: `
+                    <p>本作は<strong>最大6ラウンド（6往復）</strong>で行われる、オンラインP2P対戦型のターン制アクション迷路ゲームです。</p>
+                    <p style="border-left: 3px solid var(--crusher-red); padding-left: 8px; margin: 0.8rem 0; font-size: 0.95rem; color: var(--text-color);">
+                        お互いに<strong>「迷路作成フェーズ（ビルダー）」</strong>と<strong>「迷路脱出フェーズ（アタッカー）」</strong>を毎ラウンド交代しながら交互に挑戦します。
+                    </p>
+                    <p>脱出を成功させるか、相手の脱出を阻止することで対戦を有利に進めていきましょう。</p>
+                `
+            },
+            {
+                title: "02. 迷路作成の戦略",
+                img: "assets/characters/defender.svg",
+                color: "var(--defender-blue)",
+                desc: `
+                    <p>作成者側は、毎ターンランダムに配布される様々な罠やパーツを駆使して、相手が脱出できないような防衛ラインを築きます。</p>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+                        <li><strong>ギミック床</strong>: 進行方向を強制的に変えるベルトコンベアや、大ジャンプさせるトランポリン等を設置。</li>
+                        <li><strong>障害物＆敵</strong>: 近づくプレイヤーを追跡する「スケルトン」や、ビームを発射する「砲台」を配置可能。</li>
+                    </ul>
+                    <p style="color: var(--neon-yellow); font-size: 0.85rem; margin-top: 0.5rem;">※注意: スタートからゴールへのルートが完全に塞がれる配置は行えません（自動BFSチェック）。</p>
+                `
+            },
+            {
+                title: "03. 迷路脱出と特殊能力",
+                img: "assets/characters/ghost.svg",
+                color: "var(--ghost-purple)",
+                desc: `
+                    <p>脱出者側は、キーボード（矢印またはWASD）や画面クリックで操作し、制限時間（45秒）内にゴールを目指します。</p>
+                    <p>各キャラクターは<strong>1試合に1回だけ使用できる強力な固有スキル</strong>を持っています：</p>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+                        <li><strong>クラッシャー (赤)</strong>: 目の前にある邪魔な壁を1枚叩き壊して突き進む。</li>
+                        <li><strong>ゴースト (紫)</strong>: 厚さ1マスの壁をすり抜けて、2マス先へテレポートする。</li>
+                        <li><strong>ディフェンダー (青)</strong>: ダメージや敵の接触を1回だけ無効化するバリアを展開。</li>
+                    </ul>
+                `
+            },
+            {
+                title: "04. ライフと勝敗条件",
+                img: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M 50,25 C 50,10 20,10 20,40 C 20,65 50,85 50,85 C 50,85 80,65 80,40 C 80,10 50,10 50,25 Z" fill="%23ff007f"/></svg>',
+                color: "var(--neon-magenta)",
+                desc: `
+                    <p>各プレイヤーは<strong>ライフを3つ</strong>持った状態で対戦を開始します。</p>
+                    <p>以下の条件でライフが減少します：</p>
+                    <ul style="margin: 0.5rem 0; padding-left: 1.2rem;">
+                        <li>脱出時に敵（スケルトン）やビームに接触してダメージを受ける。</li>
+                        <li>制限時間内にゴールへ到達できずタイムアップになる。</li>
+                    </ul>
+                    <p style="margin-top: 0.8rem;"><strong>どちらかのライフが0になるか、全6ラウンド終了時に残りライフの多いプレイヤーが勝者となります！</strong></p>
+                `
+            }
+        ];
+
+        let currentGuideIndex = 0;
+
+        function updateGuideSlide() {
+            const slide = GUIDE_SLIDES[currentGuideIndex];
+            const content = document.getElementById('guide-modal-content');
+            const img = document.getElementById('guide-modal-img');
+            const title = document.getElementById('guide-modal-title');
+            const desc = document.getElementById('guide-modal-desc');
+            const imgContainer = document.getElementById('guide-modal-img-container');
+            const modalContent = document.querySelector('#modal-guide .modal-content');
+
+            if (!content || !img || !title || !desc || !imgContainer || !modalContent) return;
+
+            content.style.opacity = 0;
+            
+            setTimeout(() => {
+                img.src = slide.img;
+                img.style.filter = `drop-shadow(0 0 15px ${slide.color})`;
+                imgContainer.style.borderColor = `${slide.color}33`;
+                imgContainer.style.boxShadow = `0 0 20px ${slide.color}11`;
+                
+                title.innerText = slide.title;
+                title.style.color = slide.color;
+                desc.innerHTML = slide.desc;
+                
+                updateGuideDots();
+                
+                modalContent.style.borderColor = slide.color;
+                modalContent.style.boxShadow = `0 0 30px ${slide.color}25`;
+
+                content.style.opacity = 1;
+            }, 200);
+        }
+
+        function changeGuideSlide(dir) {
+            currentGuideIndex = (currentGuideIndex + dir + GUIDE_SLIDES.length) % GUIDE_SLIDES.length;
+            updateGuideSlide();
+            if (typeof playConfirmSound === 'function') playConfirmSound();
+        }
+
+        // キーボードの左右キーでもスライドを切り替えられるようにグローバルイベントに追加
+        window.addEventListener('keydown', (e) => {
+            const guideModal = document.getElementById('modal-guide');
+            if (guideModal && guideModal.style.display === 'flex') {
+                if (e.key === 'ArrowLeft') {
+                    changeGuideSlide(-1);
+                } else if (e.key === 'ArrowRight') {
+                    changeGuideSlide(1);
+                }
+            }
+        });
+
+        function setGuideSlide(index) {
+            if (index === currentGuideIndex) return;
+            currentGuideIndex = index;
+            updateGuideSlide();
+            if (typeof playConfirmSound === 'function') playConfirmSound();
+        }
+
+        function updateGuideDots() {
+            const container = document.getElementById('guide-dots-container');
+            if (!container) return;
+            container.innerHTML = '';
+            GUIDE_SLIDES.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `guide-dot ${idx === currentGuideIndex ? 'active' : ''}`;
+                dot.onclick = () => setGuideSlide(idx);
+                if (idx === currentGuideIndex) {
+                    dot.style.background = GUIDE_SLIDES[idx].color;
+                    dot.style.boxShadow = `0 0 8px ${GUIDE_SLIDES[idx].color}`;
+                }
+                container.appendChild(dot);
+            });
         }
 
         // --- 起動初期化 ---
