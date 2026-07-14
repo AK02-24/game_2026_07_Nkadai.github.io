@@ -2332,7 +2332,7 @@
                         gameState.client_ready = false;
                         gameState.create_time_left = GAME_CONFIG.createTimeSeconds;
                         gameState.creator_inventory = generateRandomInventory();
-                        sendGameState();
+                        sendGameState(true, true); // フェーズ交代を強制同期
 
                         goToScreen('screen-game');
                         setupGamePhase();
@@ -2433,7 +2433,7 @@
                             gameState.host_ready = false;
                             gameState.client_ready = false;
                             gameState.player_invincible_until = Date.now() + 1000; // 1秒間無敵 (リスキル防止)
-                            sendGameState();
+                            sendGameState(true, true); // フェーズ交代を強制同期
                             setupGamePhase(); // ホスト自身も画面を脱出フェーズに切り替える
                         }
                     }
@@ -2476,22 +2476,21 @@
         }
 
         // オンラインゲーム状態の送信 (P2P優先、DBへのバックアップあり)
-        function sendGameState(forceDB = false) {
+        // 第2引数 bypassGuard: true の場合は送信制限（ガード）を無視して強制送信する
+        function sendGameState(forceDB = false, bypassGuard = false) {
             if (isLocalDebugMode) return Promise.resolve();
 
-            // 【マスター権限ガード】古い無駄なデータの送信・逆流による巻き戻り破壊を防止する（クライアント側のみに限定）
-            if (myRole === 'client') {
+            // bypassGuard が指定されていない場合のみ、役割に応じた送信ガードを適用する（ホスト・クライアント双方）
+            if (!bypassGuard) {
                 const isMeCreator = (myRole === gameState.creator);
                 const isMeAttacker = (myRole === gameState.attacker);
 
                 if (gameState.phase === 'maze_create' && !isMeCreator) {
-                    // 迷路作成中は、非作成者からのデータ送信を一切禁止する
-                    console.log("sendGameState blocked: Client is not the creator in maze_create phase");
+                    console.log("sendGameState blocked: Not the creator in maze_create phase");
                     return Promise.resolve();
                 }
                 if (gameState.phase === 'maze_escape' && !isMeAttacker) {
-                    // 迷路脱出中は、非アタッカーからのデータ送信を一切禁止する
-                    console.log("sendGameState blocked: Client is not the attacker in maze_escape phase");
+                    console.log("sendGameState blocked: Not the attacker in maze_escape phase");
                     return Promise.resolve();
                 }
             }
@@ -2549,7 +2548,12 @@
         let targetPlayerPos = { x: 0, y: 0 };
         let particles = [];
 
+        let isCanvasInitialized = false;
+
         function initCanvas() {
+            if (isCanvasInitialized) return;
+            isCanvasInitialized = true;
+
             canvas = document.getElementById('game-canvas');
             ctx = canvas.getContext('2d');
             oppCanvas = document.getElementById('opponent-canvas');
@@ -4376,8 +4380,29 @@
                         activeTool = 'wall';
                         currentTemplateMatrix = null;
                     } else {
-                        activeTool = WALL_TEMPLATES[0].id;
-                        currentTemplateMatrix = JSON.parse(JSON.stringify(WALL_TEMPLATES[0].matrix));
+                        // 所持数が 1 個以上ある最初のツールを自動的に選択する
+                        let foundTool = null;
+                        const allTools = getToolbarTools(gameState, isLocalDebugMode);
+                        const filteredTools = filterToolsByCategory(allTools);
+                        for (let t of filteredTools) {
+                            if (t.id === 'wall' || t.id === 'special') {
+                                foundTool = t.id;
+                                break;
+                            }
+                            const count = gameState.creator_inventory ? (gameState.creator_inventory[t.id] || 0) : 0;
+                            if (count > 0) {
+                                foundTool = t.id;
+                                break;
+                            }
+                        }
+                        // 見つからなければデフォルトで最初のテンプレート
+                        activeTool = foundTool || WALL_TEMPLATES[0].id;
+                        const template = WALL_TEMPLATES.find(temp => temp.id === activeTool);
+                        if (template && template.matrix) {
+                            currentTemplateMatrix = JSON.parse(JSON.stringify(template.matrix));
+                        } else {
+                            currentTemplateMatrix = null;
+                        }
                     }
                     updateToolbarUI();
                     checkMazeValidity();
@@ -4634,14 +4659,14 @@
                     gameState.client_ready = false;
                     gameState.player_invincible_until = Date.now() + 1000;
 
-                    // クライアントへ送信＆DBバックアップ (forceDB = true)
-                    sendGameState(true);
+                    // クライアントへ送信＆DBバックアップ (forceDB = true, bypassGuard = true)
+                    sendGameState(true, true);
 
                     goToScreen('screen-game');
                     setupGamePhase();
                 } else {
                     // クライアントが作成者の場合、またはP2Pが未接続の場合は、相手（ホスト）に状態を送信
-                    const sendPromise = sendGameState(true);
+                    const sendPromise = sendGameState(true, true);
 
                     // PHPポーリングかつ未接続の時のみ、DB送信が完了した後にポーリングを再開する
                     if (!isP2PActive && !isFileProtocol) {
@@ -4874,7 +4899,7 @@
             gameState.broken_walls = [];
             gameState.stepped_crush_floors = [];
 
-            sendGameState();
+            sendGameState(true, true); // ターン交代を強制同期
 
             // ホスト自身も画面を切り替えて次のターンを開始する
             goToScreen('screen-game');
