@@ -433,6 +433,101 @@
             100% { opacity: 0.4; }
         }
 
+        .keycap-container {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .keycap-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+
+        .keycap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 4px;
+            background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5);
+            font-family: monospace;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 0 1px 0 rgba(0,0,0,0.8);
+            user-select: none;
+        }
+
+        .keycap.key-wide {
+            min-width: 80px;
+        }
+        
+        .key-instruction-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-top: 1rem;
+        }
+
+        /* --- 操作表示用アニメーション (実際に操作しているようなデモ表現) --- */
+        @keyframes keypress-w {
+            0%, 100% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+            15% { background: var(--neon-cyan); color: #000; border-color: var(--neon-cyan); transform: translateY(2px); box-shadow: 0 0px 0 #000, 0 0 10px var(--neon-cyan); text-shadow: none; }
+            30%, 85% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        }
+        @keyframes keypress-s {
+            0%, 20%, 100% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+            35% { background: var(--neon-cyan); color: #000; border-color: var(--neon-cyan); transform: translateY(2px); box-shadow: 0 0px 0 #000, 0 0 10px var(--neon-cyan); text-shadow: none; }
+            50%, 85% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        }
+        @keyframes keypress-a {
+            0%, 40%, 100% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+            55% { background: var(--neon-cyan); color: #000; border-color: var(--neon-cyan); transform: translateY(2px); box-shadow: 0 0px 0 #000, 0 0 10px var(--neon-cyan); text-shadow: none; }
+            70%, 85% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        }
+        @keyframes keypress-d {
+            0%, 60%, 100% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+            75% { background: var(--neon-cyan); color: #000; border-color: var(--neon-cyan); transform: translateY(2px); box-shadow: 0 0px 0 #000, 0 0 10px var(--neon-cyan); text-shadow: none; }
+            90% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+        }
+        @keyframes keypress-space {
+            0%, 75%, 100% { background: linear-gradient(180deg, #2a2c35 0%, #15161c 100%); transform: translateY(0); box-shadow: 0 2px 0 #000, 0 3px 5px rgba(0,0,0,0.5); border-color: rgba(255, 255, 255, 0.15); color: #fff; }
+            87% { background: var(--neon-magenta); color: #fff; border-color: var(--neon-magenta); transform: translateY(2px); box-shadow: 0 0px 0 #000, 0 0 12px var(--neon-magenta); text-shadow: 0 0 5px #fff; }
+        }
+        @keyframes click-left-mouse {
+            0%, 50%, 100% { filter: none; opacity: 0.6; }
+            25% { filter: drop-shadow(0 0 4px var(--neon-cyan)); opacity: 1; }
+        }
+        @keyframes click-right-mouse {
+            0%, 50%, 100% { filter: none; opacity: 0.6; }
+            25% { filter: drop-shadow(0 0 4px var(--neon-magenta)); opacity: 1; }
+        }
+        @keyframes click-escape-mouse {
+            0%, 100% { filter: none; opacity: 0.6; }
+            50% { filter: drop-shadow(0 0 5px var(--neon-cyan)); opacity: 1; }
+        }
+
+        .keycap-w { animation: keypress-w 4s infinite ease-in-out; }
+        .keycap-s { animation: keypress-s 4s infinite ease-in-out; }
+        .keycap-a { animation: keypress-a 4s infinite ease-in-out; }
+        .keycap-d { animation: keypress-d 4s infinite ease-in-out; }
+        .keycap-space { animation: keypress-space 4.5s infinite ease-in-out; }
+        .mouse-click-left { animation: click-left-mouse 2s infinite ease-in-out; }
+        .mouse-click-right { animation: click-right-mouse 2s infinite ease-in-out; }
+        .mouse-escape-animate { animation: click-escape-mouse 2.5s infinite ease-in-out; }
+
         .match-panel {
             grid-column: 3;
             background: rgba(0, 242, 254, 0.02);
@@ -1049,6 +1144,23 @@
 
         <!-- 6. ゲームメイン画面 -->
         <div id="screen-game" class="glass-panel" style="max-width: 950px; padding: 1.5rem;">
+            
+            <!-- チュートリアル用の動的フローティング指差しカーソル -->
+            <div id="guide-pointer-cursor" style="
+                position: absolute;
+                pointer-events: none;
+                z-index: 10000;
+                opacity: 0;
+                transform: translate(0, 0) scale(1);
+                transition: opacity 0.5s ease, transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+                display: none;
+                filter: drop-shadow(0 0 8px var(--neon-cyan));
+            ">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="rgba(0, 242, 254, 0.3)" stroke="var(--neon-cyan)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 12V4a1 1 0 0 0-2 0v8H8V6a1 1 0 0 0-2 0v6H4v-3a1 1 0 0 0-2 0v7a6 6 0 0 0 12 0v-3a1 1 0 0 0-2 0z" />
+                </svg>
+            </div>
+
             <div class="game-header">
                 <div>
                     <span id="game-round-info"
@@ -1112,9 +1224,39 @@
                     <!-- 作成用パネル -->
                     <div id="panel-creator-controls" style="display: none;">
                         <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">パーツ設置</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.8rem;">
-                            設置するパーツを選択し、グリッド上をクリック。通常壁はドラッグ可能です。
-                        </p>
+                        <div class="key-instruction-group" style="margin-bottom: 1rem;">
+                            <!-- 左クリック配置 -->
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 32px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.02);">
+                                    <svg class="mouse-click-left" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--neon-cyan);">
+                                        <rect x="5" y="2" width="14" height="20" rx="7" />
+                                        <path d="M12 2v7" />
+                                        <path d="M5 9h7" />
+                                        <path d="M5 9c0-3.87 3.13-7 7-7" stroke-width="3" />
+                                    </svg>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
+                                    左クリック / ドラッグ<br>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">パーツ配置・壁の連続描画</span>
+                                </div>
+                            </div>
+
+                            <!-- 右クリック撤去 -->
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 32px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.02);">
+                                    <svg class="mouse-click-right" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--neon-magenta);">
+                                        <rect x="5" y="2" width="14" height="20" rx="7" />
+                                        <path d="M12 2v7" />
+                                        <path d="M12 9h7" />
+                                        <path d="M12 2c3.87 0 7 3.13 7 7" stroke-width="3" />
+                                    </svg>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
+                                    右クリック / ダブルクリック<br>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">配置したパーツを撤去（回収）</span>
+                                </div>
+                            </div>
+                        </div>
                         <div style="margin-bottom: 0.8rem; display: flex; gap: 0.5rem;">
                             <button class="btn btn-small btn-magenta" onclick="rotateActiveTemplate()"
                                 style="margin: 0; width: 100%; font-size: 0.85rem; padding: 0.4rem; border-color: var(--neon-magenta); text-shadow: none; box-shadow: none;">パーツを回転
@@ -1151,11 +1293,60 @@
                     <!-- 脱出用パネル -->
                     <div id="panel-escaper-controls" style="display: none;">
                         <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">脱出操作</h3>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
-                            <strong style="color: var(--neon-yellow);">WASDキー</strong> または <strong
-                                style="color: var(--neon-yellow);">矢印キー</strong> でキャラクターを動かし、右下のゴールを目指します。<br><br>
-                            敵やビームなどの攻撃を受けるか、時間切れになるとライフを失います。
-                        </p>
+                        <div class="key-instruction-group" style="margin-bottom: 1rem;">
+                            <!-- 移動操作 -->
+                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <div class="keycap-row">
+                                        <span class="keycap keycap-w">W</span>
+                                    </div>
+                                    <div class="keycap-row">
+                                        <span class="keycap keycap-a">A</span>
+                                        <span class="keycap keycap-s">S</span>
+                                        <span class="keycap keycap-d">D</span>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.75rem; color: var(--text-muted);">or</span>
+                                <div style="display: flex; flex-direction: column; align-items: center;">
+                                    <div class="keycap-row">
+                                        <span class="keycap keycap-w">▲</span>
+                                    </div>
+                                    <div class="keycap-row">
+                                        <span class="keycap keycap-a">◀</span>
+                                        <span class="keycap keycap-s">▼</span>
+                                        <span class="keycap keycap-d">▶</span>
+                                    </div>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3; margin-left: 0.3rem;">
+                                    移動<br>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">(キー移動)</span>
+                                </div>
+                            </div>
+
+                            <!-- 特殊能力キー -->
+                            <div style="display: flex; align-items: center; gap: 0.8rem; margin-top: 0.5rem;">
+                                <span class="keycap key-wide keycap-space" id="hud-guide-ability-key">SPACE</span>
+                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
+                                    特殊能力発動<br>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">(壁破壊 / バリア 等)</span>
+                                </div>
+                            </div>
+
+                            <!-- マウスクリック移動 -->
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 32px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.02);">
+                                    <svg class="mouse-escape-animate" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan);">
+                                        <rect x="5" y="2" width="14" height="20" rx="7" />
+                                        <path d="M12 2v6" />
+                                        <path d="M5 9h14" />
+                                    </svg>
+                                </div>
+                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
+                                    画面クリック<br>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">行きたいマスをクリック</span>
+                                </div>
+                            </div>
+                        </div>
                         <div
                             style="margin-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 1rem;">
                             <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">固有能力状況</h4>
@@ -4353,10 +4544,12 @@
             panelWaiting.style.display = 'none';
             confirmBtn.style.display = 'none';
             document.getElementById('expression-frame').style.display = 'none';
+            stopCreatorGuide();
 
             if (gameState.phase === 'maze_create') {
                 roleBadge.innerText = "迷路作成フェーズ";
                 roleBadge.className = "phase-badge phase-create";
+                resetCreatorIdleTimer();
 
                 // 迷路データ初期化 (ホストが代表してリセット)
                 if (isLocalDebugMode) {
@@ -4427,6 +4620,7 @@
                 startGameLoop();
             }
             else if (gameState.phase === 'maze_escape') {
+                stopCreatorGuide();
                 roleBadge.innerText = "迷路脱出フェーズ";
                 roleBadge.className = "phase-badge phase-escape";
                 document.getElementById('expression-frame').style.display = 'block';
@@ -4568,6 +4762,17 @@
             document.getElementById('hud-client-life').innerText = clientHearts;
         }
 
+        function updateGuideKeysUI() {
+            const keyEl = document.getElementById('hud-guide-ability-key');
+            if (keyEl) {
+                if (appSettings && appSettings.control_type === 'custom') {
+                    keyEl.innerText = appSettings.key_ability.toUpperCase();
+                } else {
+                    keyEl.innerText = 'SPACE';
+                }
+            }
+        }
+
         function updateAbilityStatusHUD() {
             const attackerChar = (gameState.attacker === 'host') ? gameState.host_char : gameState.client_char;
             const statusBox = document.getElementById('ability-status-box');
@@ -4588,6 +4793,7 @@
                     ? '<span style="color:var(--text-muted);">バリア: 消費済み</span>'
                     : '<span style="color:var(--defender-blue); font-weight:bold;">バリア展開中: 1回</span> (敵やビームに接触した際、自動的に無効化します)';
             }
+            updateGuideKeysUI();
         }
 
         // 迷路作成ツール選択
@@ -5328,6 +5534,119 @@
             }, 200);
         }
 
+        // --- 迷路作成時の5秒間放置ガイド演出 ---
+        let creatorIdleTimeout = null;
+        let guideAnimationInterval = null;
+        let isGuideActive = false;
+
+        function resetCreatorIdleTimer() {
+            stopCreatorGuide();
+            if (gameState.phase !== 'maze_create') return;
+
+            const isMeCreator = isLocalDebugMode ? (localTurnOwner === gameState.creator) : (myRole === gameState.creator);
+            if (!isMeCreator) return;
+
+            clearTimeout(creatorIdleTimeout);
+            creatorIdleTimeout = setTimeout(startCreatorGuide, 5000);
+        }
+
+        function startCreatorGuide() {
+            if (gameState.phase !== 'maze_create') return;
+            const cursor = document.getElementById('guide-pointer-cursor');
+            const canvas = document.getElementById('game-canvas');
+            const toolbarContainer = document.getElementById('creator-toolbar-container');
+            if (!cursor || !canvas || !toolbarContainer) return;
+
+            const firstButton = toolbarContainer.querySelector('.tool-btn');
+            if (!firstButton) return;
+
+            isGuideActive = true;
+            cursor.style.display = 'block';
+            cursor.style.opacity = '0';
+
+            let step = 0;
+
+            function animateStep() {
+                if (!isGuideActive || gameState.phase !== 'maze_create') {
+                    stopCreatorGuide();
+                    return;
+                }
+
+                const rectBtn = firstButton.getBoundingClientRect();
+                const rectCanvas = canvas.getBoundingClientRect();
+                const rectScreen = document.getElementById('screen-game').getBoundingClientRect();
+
+                // 親要素 screen-game からの相対座標を計算
+                const btnX = rectBtn.left - rectScreen.left + rectBtn.width / 2 - 10;
+                const btnY = rectBtn.top - rectScreen.top + rectBtn.height / 2 - 5;
+
+                const canvasX = rectCanvas.left - rectScreen.left + rectCanvas.width * 0.4;
+                const canvasY = rectCanvas.top - rectScreen.top + rectCanvas.height * 0.4;
+
+                if (step === 0) {
+                    cursor.style.transition = 'none';
+                    cursor.style.transform = `translate(${btnX}px, ${btnY}px) scale(1.2)`;
+                    cursor.style.opacity = '0';
+
+                    requestAnimationFrame(() => {
+                        cursor.style.transition = 'opacity 0.5s ease';
+                        cursor.style.opacity = '0.7'; // 視認性向上のため少し濃くします
+                    });
+
+                    setTimeout(() => {
+                        if (!isGuideActive) return;
+                        cursor.style.transition = 'transform 0.2s ease';
+                        cursor.style.transform = `translate(${btnX}px, ${btnY}px) scale(0.9)`;
+                        setTimeout(() => {
+                            if (!isGuideActive) return;
+                            cursor.style.transform = `translate(${btnX}px, ${btnY}px) scale(1.1)`;
+                        }, 200);
+                    }, 800);
+
+                    step = 1;
+                    guideAnimationInterval = setTimeout(animateStep, 1500);
+                } 
+                else if (step === 1) {
+                    cursor.style.transition = 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.5s ease';
+                    cursor.style.transform = `translate(${canvasX}px, ${canvasY}px) scale(1.1)`;
+
+                    setTimeout(() => {
+                        if (!isGuideActive) return;
+                        cursor.style.transition = 'transform 0.2s ease';
+                        cursor.style.transform = `translate(${canvasX}px, ${canvasY}px) scale(0.9)`;
+                        setTimeout(() => {
+                            if (!isGuideActive) return;
+                            cursor.style.transform = `translate(${canvasX}px, ${canvasY}px) scale(1.1)`;
+                        }, 200);
+                    }, 1200);
+
+                    step = 2;
+                    guideAnimationInterval = setTimeout(animateStep, 2000);
+                } 
+                else if (step === 2) {
+                    cursor.style.transition = 'opacity 0.6s ease';
+                    cursor.style.opacity = '0';
+
+                    step = 0;
+                    guideAnimationInterval = setTimeout(animateStep, 1000);
+                }
+            }
+
+            animateStep();
+        }
+
+        function stopCreatorGuide() {
+            isGuideActive = false;
+            if (guideAnimationInterval) clearTimeout(guideAnimationInterval);
+            const cursor = document.getElementById('guide-pointer-cursor');
+            if (cursor) {
+                cursor.style.opacity = '0';
+                setTimeout(() => {
+                    if (!isGuideActive) cursor.style.display = 'none';
+                }, 500);
+            }
+        }
+
         function changeGuideSlide(dir) {
             currentGuideIndex = (currentGuideIndex + dir + GUIDE_SLIDES.length) % GUIDE_SLIDES.length;
             updateGuideSlide();
@@ -5375,6 +5694,11 @@
             updatePreviewCharUI();
             gameState.phase = 'init';
             loadSettings();
+
+            // 無操作ガイド検知フックのバインド
+            window.addEventListener('mousedown', resetCreatorIdleTimer);
+            window.addEventListener('touchstart', resetCreatorIdleTimer);
+            window.addEventListener('keydown', resetCreatorIdleTimer);
 
             // レジストリUI（パーツ・キャラ一覧）の初期化と画像プレロード
             if (typeof initRegistryUI === 'function') initRegistryUI();
