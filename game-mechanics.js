@@ -210,11 +210,11 @@ function placeSingleTile(state, x, y, tile, dir, partId) {
     
     // スケルトンの場合、敵管理リストに追加
     if (tile === TILE.SKELETON) {
-        state.enemies.push({ type: 'skeleton', x, y, dir: dir || 'right' });
+        state.enemies.push({ type: 'skeleton', x, y, dir: dir || 'right', underTile: TILE.EMPTY });
     } 
     // 石像の場合、敵管理リストに追加
     else if (tile === TILE.STATUE) {
-        state.enemies.push({ type: 'statue', x, y });
+        state.enemies.push({ type: 'statue', x, y, underTile: TILE.EMPTY });
     } 
     // 砲台壁の場合、発射インターバルのメタデータを初期設定
     else if (tile === TILE.CANNON) {
@@ -317,6 +317,7 @@ function initEscapePhase(state) {
     state.beams = [];
     state.enemies.forEach(e => {
         if (e.type === 'skeleton') e.dir = e.dir || 'right';
+        e.underTile = TILE.EMPTY; // 脱出開始時に初期化
     });
 }
 
@@ -406,9 +407,14 @@ function moveSkeletons(state) {
                 ny = enemy.y + vec.dy;
             }
             
-            // 移動が可能な場合は、前のマスをクリアして移動先を敵タイルに書き換える
+            // 移動が可能な場合は、前のマスを元に戻して移動先を敵タイルに書き換える
             if (isInsideMaze(nx, ny, state.maze.length) && !isBlockingWall(state.maze[ny][nx]) && state.maze[ny][nx] !== TILE.SKELETON) {
-                state.maze[enemy.y][enemy.x] = TILE.EMPTY;
+                // 移動前のマスを元の床に復元する
+                state.maze[enemy.y][enemy.x] = (enemy.underTile !== undefined) ? enemy.underTile : TILE.EMPTY;
+                
+                // 新しい移動先の元の床を退避する
+                enemy.underTile = state.maze[ny][nx];
+                
                 enemy.x = nx;
                 enemy.y = ny;
                 state.maze[ny][nx] = TILE.SKELETON;
@@ -429,7 +435,12 @@ function updateStatues(state, playerDx, playerDy) {
             let nx = enemy.x + playerDx;
             let ny = enemy.y + playerDy;
             if (isInsideMaze(nx, ny, state.maze.length) && !isBlockingWall(state.maze[ny][nx]) && state.maze[ny][nx] !== TILE.STATUE) {
-                state.maze[enemy.y][enemy.x] = TILE.EMPTY;
+                // 移動前のマスを元の床に復元する
+                state.maze[enemy.y][enemy.x] = (enemy.underTile !== undefined) ? enemy.underTile : TILE.EMPTY;
+                
+                // 新しい移動先の元の床を退避する
+                enemy.underTile = state.maze[ny][nx];
+                
                 enemy.x = nx;
                 enemy.y = ny;
                 state.maze[ny][nx] = TILE.STATUE;
