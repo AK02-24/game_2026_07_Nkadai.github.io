@@ -4921,7 +4921,7 @@
 
         // リザルトからの戻り処理 (ゲーム終了後にホーム画面に戻るように変更)
         function returnToHome() {
-            if (sessionId && !isLocalDebugMode) {
+            if (sessionId && !isLocalDebugMode && !isFileProtocol) {
                 fetch('./api_session.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -4984,6 +4984,11 @@
         // 1秒ごとにPHPサーバーへ対戦相手の最新状態を問い合わせます。
         // ==========================================================================
         function startWorker(sid) {
+            // 静的ホスティング環境（GitHub Pagesなど）ではPHPポーリングは動かないため無効化
+            if (isFileProtocol) {
+                console.log("Static environment (GitHub Pages) detected. Polling worker is disabled.");
+                return;
+            }
             // WebRTC（P2P）通信が繋がっている場合は直接通信するため、WorkerによるDB通信は不要です
             if (isP2PActive) {
                 console.log("P2P is active. Skipping worker start.");
