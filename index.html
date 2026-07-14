@@ -528,6 +528,102 @@
         .mouse-click-right { animation: click-right-mouse 2s infinite ease-in-out; }
         .mouse-escape-animate { animation: click-escape-mouse 2.5s infinite ease-in-out; }
 
+        .mini-guide-card {
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .mini-guide-card:hover {
+            background: rgba(255, 255, 255, 0.07) !important;
+            border-color: rgba(255, 255, 255, 0.18) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        #mini-slide-creator-img, #mini-slide-escaper-img {
+            transition: opacity 0.15s ease-in-out;
+        }
+
+        /* --- ダメージ時のカメラズーム・ハート分裂演出 --- */
+        /* 砕け散るハートの破片 */
+        .heart-shard {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: #ff3b30;
+            filter: drop-shadow(0 0 4px #ff3b30);
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+            opacity: 0;
+            animation: shard-shatter 1.8s 0.4s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .heart-shard.shard-type2 {
+            width: 6px;
+            height: 10px;
+            clip-path: polygon(0% 15%, 100% 0%, 80% 85%, 20% 100%);
+        }
+
+        .heart-shard.shard-type3 {
+            width: 9px;
+            height: 6px;
+            clip-path: polygon(30% 0%, 80% 20%, 100% 80%, 0% 60%);
+        }
+
+        /* 割れる前の綺麗なハート（身代わり） */
+        .breaking-heart-original {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            z-index: 10006;
+            transform: scale(1.1);
+            animation: original-heart-disappear 0.4s forwards steps(1);
+        }
+
+        @keyframes original-heart-disappear {
+            0% {
+                opacity: 1;
+                transform: scale(1.1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(1.3);
+            }
+        }
+
+        @keyframes shard-shatter {
+            0% {
+                transform: translate(0, 0) rotate(0deg) scale(1.2);
+                opacity: 1;
+            }
+            10% {
+                filter: drop-shadow(0 0 10px #ff3b30) brightness(1.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--dx), calc(var(--dy) + 40px)) rotate(var(--rot)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        #screen-game {
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        #screen-game.damage-camera-zoom {
+            transform: scale(3.2) !important;
+            z-index: 9999;
+        }
+
+        .breaking-heart-container {
+            position: absolute;
+            pointer-events: none;
+            width: 20px;
+            height: 20px;
+            z-index: 10005;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            top: 0;
+        }
+
+
         .match-panel {
             grid-column: 3;
             background: rgba(0, 242, 254, 0.02);
@@ -768,14 +864,33 @@
         .game-side-panel {
             display: flex;
             flex-direction: column;
-            gap: 1.5rem;
+            gap: 1rem;
             text-align: left;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 1.2rem;
+            width: 280px;
             height: 496px;
-            justify-content: space-between;
+            overflow-y: auto;
+            justify-content: flex-start;
+            box-sizing: border-box;
+        }
+
+        /* サイドパネル専用の美しいスクロールバー */
+        .game-side-panel::-webkit-scrollbar {
+            width: 5px;
+        }
+        .game-side-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .game-side-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 242, 254, 0.2);
+            border-radius: 10px;
+        }
+        .game-side-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 242, 254, 0.5);
         }
 
         .player-status {
@@ -1224,6 +1339,30 @@
                     <!-- 作成用パネル -->
                     <div id="panel-creator-controls" style="display: none;">
                         <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">パーツ設置</h3>
+
+                        <!-- ビジュアル操作説明ミニスライド (迷路作成時) -->
+                        <div class="mini-guide-card" onclick="nextMiniSlide('creator')" style="
+                            background: rgba(255, 255, 255, 0.03);
+                            border: 1px solid rgba(255, 255, 255, 0.08);
+                            border-radius: 12px;
+                            padding: 0.8rem;
+                            margin-bottom: 1rem;
+                            cursor: pointer;
+                            position: relative;
+                            overflow: hidden;
+                        ">
+                            <div style="height: 64px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; background: rgba(0,0,0,0.25); border-radius: 8px;">
+                                <img id="mini-slide-creator-img" src="assets/characters/crusher.svg" style="height: 56px; filter: drop-shadow(0 0 5px var(--neon-cyan));">
+                            </div>
+                            <h4 id="mini-slide-creator-title" style="margin: 0 0 0.2rem 0; font-size: 0.85rem; color: var(--neon-cyan); text-align: center;">通常壁のドラッグ設置</h4>
+                            <p id="mini-slide-creator-desc" style="margin: 0; font-size: 0.72rem; line-height: 1.35; color: var(--text-muted); text-align: left;">
+                                「通常壁」パーツを選択し、グリッド上をドラッグして道を素早く塞ぐことができます。
+                            </p>
+                            <div style="margin-top: 0.3rem; text-align: right; font-size: 0.65rem; color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: flex-end; gap: 2px;">
+                                タップで切替 <span>▶</span>
+                            </div>
+                        </div>
+
                         <div class="key-instruction-group" style="margin-bottom: 1rem;">
                             <!-- 左クリック配置 -->
                             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -1293,39 +1432,65 @@
                     <!-- 脱出用パネル -->
                     <div id="panel-escaper-controls" style="display: none;">
                         <h3 style="font-size: 1rem; margin-bottom: 0.5rem;">脱出操作</h3>
+
+                        <!-- ビジュアル操作説明ミニスライド (迷路脱出時) -->
+                        <div class="mini-guide-card" onclick="nextMiniSlide('escaper')" style="
+                            background: rgba(255, 255, 255, 0.03);
+                            border: 1px solid rgba(255, 255, 255, 0.08);
+                            border-radius: 12px;
+                            padding: 0.8rem;
+                            margin-bottom: 1rem;
+                            cursor: pointer;
+                            position: relative;
+                            overflow: hidden;
+                        ">
+                            <div style="height: 64px; display: flex; align-items: center; justify-content: center; margin-bottom: 0.4rem; background: rgba(0,0,0,0.25); border-radius: 8px;">
+                                <img id="mini-slide-escaper-img" src="assets/characters/defender.svg" style="height: 56px; filter: drop-shadow(0 0 5px var(--neon-magenta));">
+                            </div>
+                            <h4 id="mini-slide-escaper-title" style="margin: 0 0 0.2rem 0; font-size: 0.85rem; color: var(--neon-magenta); text-align: center;">移動方法</h4>
+                            <p id="mini-slide-escaper-desc" style="margin: 0; font-size: 0.72rem; line-height: 1.35; color: var(--text-muted); text-align: left;">
+                                キーボードのWASDまたは矢印キーで動けます。移動先マスをクリックして動くことも可能。
+                            </p>
+                            <div style="margin-top: 0.3rem; text-align: right; font-size: 0.65rem; color: rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: flex-end; gap: 2px;">
+                                タップで切替 <span>▶</span>
+                            </div>
+                        </div>
+
                         <div class="key-instruction-group" style="margin-bottom: 1rem;">
                             <!-- 移動操作 -->
-                            <div style="display: flex; align-items: center; gap: 0.6rem;">
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <div class="keycap-row">
-                                        <span class="keycap keycap-w">W</span>
+                            <div style="display: flex; align-items: center; gap: 0.6rem; flex-wrap: nowrap;">
+                                <div style="display: flex; align-items: center; gap: 0.3rem;">
+                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                        <div class="keycap-row">
+                                            <span class="keycap keycap-w" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">W</span>
+                                        </div>
+                                        <div class="keycap-row">
+                                            <span class="keycap keycap-a" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">A</span>
+                                            <span class="keycap keycap-s" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">S</span>
+                                            <span class="keycap keycap-d" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">D</span>
+                                        </div>
                                     </div>
-                                    <div class="keycap-row">
-                                        <span class="keycap keycap-a">A</span>
-                                        <span class="keycap keycap-s">S</span>
-                                        <span class="keycap keycap-d">D</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-muted);">/</span>
+                                    <div style="display: flex; flex-direction: column; align-items: center;">
+                                        <div class="keycap-row">
+                                            <span class="keycap keycap-w" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">▲</span>
+                                        </div>
+                                        <div class="keycap-row">
+                                            <span class="keycap keycap-a" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">◀</span>
+                                            <span class="keycap keycap-s" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">▼</span>
+                                            <span class="keycap keycap-d" style="min-width: 22px; height: 22px; font-size: 0.7rem; padding: 0 2px;">▶</span>
+                                        </div>
                                     </div>
                                 </div>
-                                <span style="font-size: 0.75rem; color: var(--text-muted);">or</span>
-                                <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <div class="keycap-row">
-                                        <span class="keycap keycap-w">▲</span>
-                                    </div>
-                                    <div class="keycap-row">
-                                        <span class="keycap keycap-a">◀</span>
-                                        <span class="keycap keycap-s">▼</span>
-                                        <span class="keycap keycap-d">▶</span>
-                                    </div>
-                                </div>
-                                <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3; margin-left: 0.3rem;">
+                                <div style="font-size: 0.75rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
                                     移動<br>
-                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">(キー移動)</span>
+                                    <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: normal;">(キー操作)</span>
                                 </div>
                             </div>
 
                             <!-- 特殊能力キー -->
                             <div style="display: flex; align-items: center; gap: 0.8rem; margin-top: 0.5rem;">
-                                <span class="keycap key-wide keycap-space" id="hud-guide-ability-key">SPACE</span>
+                                <span class="keycap key-wide keycap-space" id="hud-guide-ability-key" style="min-width: 70px; height: 26px; font-size: 0.75rem;">SPACE</span>
                                 <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
                                     特殊能力発動<br>
                                     <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">(壁破壊 / バリア 等)</span>
@@ -1333,9 +1498,9 @@
                             </div>
 
                             <!-- マウスクリック移動 -->
-                            <div style="display: flex; align-items: center; gap: 1rem; margin-top: 0.5rem;">
-                                <div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 32px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.02);">
-                                    <svg class="mouse-escape-animate" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan);">
+                            <div style="display: flex; align-items: center; gap: 0.8rem; margin-top: 0.5rem;">
+                                <div style="display: flex; align-items: center; justify-content: center; width: 36px; height: 28px; border: 1px solid rgba(255,255,255,0.15); border-radius: 6px; background: rgba(255,255,255,0.02); flex-shrink: 0;">
+                                    <svg class="mouse-escape-animate" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--neon-cyan);">
                                         <rect x="5" y="2" width="14" height="20" rx="7" />
                                         <path d="M12 2v6" />
                                         <path d="M5 9h14" />
@@ -1343,7 +1508,7 @@
                                 </div>
                                 <div style="font-size: 0.8rem; color: var(--text-color); font-weight: bold; line-height: 1.3;">
                                     画面クリック<br>
-                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">行きたいマスをクリック</span>
+                                    <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">移動先マスをクリック</span>
                                 </div>
                             </div>
                         </div>
@@ -2637,12 +2802,19 @@
                         gameState.enemies = serverGame.enemies || [];
                         gameState.player_invincible_until = serverGame.player_invincible_until || 0;
                         gameState.defender_barrier_active = serverGame.defender_barrier_active || false;
+                        
+                        // 1. 脱出フェーズ中のライフデータを同期する
+                        gameState.host_life = serverGame.host_life;
+                        gameState.client_life = serverGame.client_life;
 
                         targetPlayerPos.x = gameState.player_pos.x;
                         targetPlayerPos.y = gameState.player_pos.y;
 
                         // タイマー表示を同期
                         document.getElementById('game-timer').innerText = gameState.escape_time_left;
+
+                        // 2. ライフ表示の更新および被弾・ズーム演出を呼び出す
+                        updateLifeHUD();
                     }
                     gameState.phase = serverGame.phase;
                     gameState.host_ready = serverGame.host_ready;
@@ -4549,6 +4721,8 @@
             if (gameState.phase === 'maze_create') {
                 roleBadge.innerText = "迷路作成フェーズ";
                 roleBadge.className = "phase-badge phase-create";
+                activeCreatorSlideIdx = 0;
+                updateMiniSlideUI('creator');
                 resetCreatorIdleTimer();
 
                 // 迷路データ初期化 (ホストが代表してリセット)
@@ -4623,6 +4797,8 @@
                 stopCreatorGuide();
                 roleBadge.innerText = "迷路脱出フェーズ";
                 roleBadge.className = "phase-badge phase-escape";
+                activeEscaperSlideIdx = 0;
+                updateMiniSlideUI('escaper');
                 document.getElementById('expression-frame').style.display = 'block';
 
                 const attackerChar = (gameState.attacker === 'host') ? gameState.host_char : gameState.client_char;
@@ -4754,9 +4930,119 @@
             }
         }
 
+        let lastHostLife = 3;
+        let lastClientLife = 3;
+
+        function resetLifeTracking() {
+            lastHostLife = (gameState && typeof gameState.host_life !== 'undefined') ? Math.max(0, gameState.host_life) : 3;
+            lastClientLife = (gameState && typeof gameState.client_life !== 'undefined') ? Math.max(0, gameState.client_life) : 3;
+        }
+
+        function triggerDamageCameraZoom(target, previousLife) {
+            // サイドパネルがスクロールされている場合は最上部へ戻してHUDを表示
+            const sidePanel = document.querySelector('.game-side-panel');
+            if (sidePanel) {
+                sidePanel.scrollTop = 0;
+            }
+
+            const screenGame = document.getElementById('screen-game');
+            if (!screenGame) return;
+
+            const hudId = (target === 'host') ? 'hud-host-life' : 'hud-client-life';
+            const hudEl = document.getElementById(hudId);
+
+            if (hudEl) {
+                // 1. ライフHUD要素に position: relative を指定して基準にする
+                hudEl.style.position = 'relative';
+
+                const rect = hudEl.getBoundingClientRect();
+                const screenRect = screenGame.getBoundingClientRect();
+
+                // 2. ライフHUDの screen-game 内における％位置を正確に算出してズームの原点に設定
+                const percentX = ((rect.left + rect.width / 2 - screenRect.left) / screenRect.width) * 100;
+                const percentY = ((rect.top + rect.height / 2 - screenRect.top) / screenRect.height) * 100;
+                screenGame.style.transformOrigin = `${percentX}% ${percentY}%`;
+
+                // 3. カメラ接近ズーム
+                screenGame.classList.add('damage-camera-zoom');
+
+                // 4. ハート割れエフェクトコンテナの生成 (hudEl の子要素にする)
+                const effectContainer = document.createElement('div');
+                effectContainer.className = 'breaking-heart-container';
+
+                // 失われたハート（右端のハート）のインデックスに応じたX座標補正
+                const lostHeartIdx = Math.max(0, previousLife - 1);
+                // HUDのテキスト配置に合わせたフォントサイズ調整
+                const offsetCharX = lostHeartIdx * 16;
+
+                // hudEl 内部での絶対位置を指定
+                effectContainer.style.left = `${offsetCharX}px`;
+
+                // 割れる前の綺麗なハートを追加 (身代わり)
+                const originalHeart = document.createElement('div');
+                originalHeart.className = 'breaking-heart-original';
+                originalHeart.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#ff3b30" filter="drop-shadow(0 0 4px #ff3b30)"/>
+                    </svg>
+                `;
+                effectContainer.appendChild(originalHeart);
+
+                // 12個のガラス片を生成して360度方向へランダムに飛散させる
+                const shardCount = 12;
+                for (let i = 0; i < shardCount; i++) {
+                    const shard = document.createElement('div');
+                    const type = (i % 3 === 0) ? ' shard-type2' : (i % 3 === 1 ? ' shard-type3' : '');
+                    shard.className = `heart-shard${type}`;
+
+                    const angle = (i / shardCount) * 2 * Math.PI + (Math.random() - 0.5) * 0.4;
+                    const distance = 15 + Math.random() * 25; // 飛散半径 (15px〜40px)
+                    const dx = Math.cos(angle) * distance;
+                    const dy = Math.sin(angle) * distance;
+                    const rot = (Math.random() - 0.5) * 720; // ランダム回転
+
+                    shard.style.setProperty('--dx', `${dx}px`);
+                    shard.style.setProperty('--dy', `${dy}px`);
+                    shard.style.setProperty('--rot', `${rot}deg`);
+
+                    // 破片が中央からスタートするように配置
+                    shard.style.left = `${6 + (Math.random() - 0.5) * 4}px`;
+                    shard.style.top = `${6 + (Math.random() - 0.5) * 4}px`;
+
+                    effectContainer.appendChild(shard);
+                }
+
+                // 画面(screenGame)ではなく、直接ライフHUD要素(hudEl)に追加！
+                hudEl.appendChild(effectContainer);
+
+                setTimeout(() => {
+                    effectContainer.remove();
+                }, 2600);
+            }
+
+            // 5. カメラを元に戻す (ハートが割れきった後の2.0秒後に引き始める)
+            setTimeout(() => {
+                screenGame.classList.remove('damage-camera-zoom');
+            }, 2000);
+        }
+
         function updateLifeHUD() {
-            const hostHearts = "♥".repeat(Math.max(0, gameState.host_life)) + "♡".repeat(Math.max(0, 3 - gameState.host_life));
-            const clientHearts = "♥".repeat(Math.max(0, gameState.client_life)) + "♡".repeat(Math.max(0, 3 - gameState.client_life));
+            const currentHostLife = (gameState && typeof gameState.host_life !== 'undefined') ? Math.max(0, gameState.host_life) : 3;
+            const currentClientLife = (gameState && typeof gameState.client_life !== 'undefined') ? Math.max(0, gameState.client_life) : 3;
+
+            // ライフ減少検知
+            if (currentHostLife < lastHostLife) {
+                triggerDamageCameraZoom('host', lastHostLife);
+            }
+            if (currentClientLife < lastClientLife) {
+                triggerDamageCameraZoom('client', lastClientLife);
+            }
+
+            lastHostLife = currentHostLife;
+            lastClientLife = currentClientLife;
+
+            const hostHearts = "♥".repeat(currentHostLife) + "♡".repeat(Math.max(0, 3 - currentHostLife));
+            const clientHearts = "♥".repeat(currentClientLife) + "♡".repeat(Math.max(0, 3 - currentClientLife));
 
             document.getElementById('hud-host-life').innerText = hostHearts;
             document.getElementById('hud-client-life').innerText = clientHearts;
@@ -5651,6 +5937,89 @@
             currentGuideIndex = (currentGuideIndex + dir + GUIDE_SLIDES.length) % GUIDE_SLIDES.length;
             updateGuideSlide();
             if (typeof playConfirmSound === 'function') playConfirmSound();
+        }
+
+        // --- 右パネルミニスライドの制御 ---
+        let activeCreatorSlideIdx = 0;
+        let activeEscaperSlideIdx = 0;
+
+        const CREATOR_MINI_SLIDES = [
+            {
+                img: 'assets/characters/crusher.svg',
+                title: '通常壁のドラッグ設置',
+                desc: '「通常壁」パーツを選択し、グリッド上をドラッグして道を素早く塞ぐことができます。'
+            },
+            {
+                img: 'assets/parts/floor_trampoline.svg',
+                title: '特殊ギミックの設置',
+                desc: 'コンベアやトゲ床、動く敵を配置して、脱出者がゴールへ進むのを妨害しましょう！'
+            },
+            {
+                img: 'assets/parts/wall_normal.svg',
+                title: '回転と撤去操作',
+                desc: 'パーツは設置前に「パーツを回転」かRキーで向きを変えられます。右クリックで撤去可能。'
+            }
+        ];
+
+        const ESCAPER_MINI_SLIDES = [
+            {
+                img: 'assets/characters/defender.svg',
+                title: '移動方法',
+                desc: 'キーボードのWASDまたは矢印キーで動けます。移動先マスをクリックして動くことも可能。'
+            },
+            {
+                img: 'assets/characters/ghost.svg',
+                title: '特殊能力の発動',
+                desc: '壁の破壊やすり抜けは、壁に向かって進むかSPACEキーを押すと発動します。'
+            },
+            {
+                img: 'assets/parts/enemy_skeleton.svg',
+                title: '敵・罠の回避とゴール',
+                desc: '敵やビームを避け、制限時間内に右下のゴールマス（緑の床）へ無さに辿り着きましょう！'
+            }
+        ];
+
+        function nextMiniSlide(phase) {
+            if (phase === 'creator') {
+                activeCreatorSlideIdx = (activeCreatorSlideIdx + 1) % CREATOR_MINI_SLIDES.length;
+                updateMiniSlideUI('creator');
+            } else {
+                activeEscaperSlideIdx = (activeEscaperSlideIdx + 1) % ESCAPER_MINI_SLIDES.length;
+                updateMiniSlideUI('escaper');
+            }
+            if (typeof playConfirmSound === 'function') playConfirmSound();
+        }
+
+        function updateMiniSlideUI(phase) {
+            if (phase === 'creator') {
+                const slide = CREATOR_MINI_SLIDES[activeCreatorSlideIdx];
+                const imgEl = document.getElementById('mini-slide-creator-img');
+                const titleEl = document.getElementById('mini-slide-creator-title');
+                const descEl = document.getElementById('mini-slide-creator-desc');
+                if (imgEl && titleEl && descEl) {
+                    imgEl.style.opacity = '0';
+                    setTimeout(() => {
+                        imgEl.src = slide.img;
+                        titleEl.innerText = slide.title;
+                        descEl.innerText = slide.desc;
+                        imgEl.style.opacity = '1';
+                    }, 100);
+                }
+            } else {
+                const slide = ESCAPER_MINI_SLIDES[activeEscaperSlideIdx];
+                const imgEl = document.getElementById('mini-slide-escaper-img');
+                const titleEl = document.getElementById('mini-slide-escaper-title');
+                const descEl = document.getElementById('mini-slide-escaper-desc');
+                if (imgEl && titleEl && descEl) {
+                    imgEl.style.opacity = '0';
+                    setTimeout(() => {
+                        imgEl.src = slide.img;
+                        titleEl.innerText = slide.title;
+                        descEl.innerText = slide.desc;
+                        imgEl.style.opacity = '1';
+                    }, 100);
+                }
+            }
         }
 
         // キーボードの左右キーでもスライドを切り替えられるようにグローバルイベントに追加
